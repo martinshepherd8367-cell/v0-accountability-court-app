@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MapPin, Users, Play, Clock } from "lucide-react"
+import Link from "next/link"
 
 export function NextClassCard() {
   return (
@@ -41,10 +42,12 @@ export function NextClassCard() {
           </div>
 
           {/* Action Button */}
-          <Button className="w-full gap-2" size="lg">
-            <Play className="h-4 w-4" />
-            Start Class Session
-          </Button>
+          <Link href="/session/ps-session-4">
+            <Button className="w-full gap-2" size="lg">
+              <Play className="h-4 w-4" />
+              Start Class Session
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>
