@@ -149,7 +149,11 @@ export function ActiveProgramsList() {
                   </div>
 
                   {/* View Details Link */}
-                  <Button variant="link" className="h-auto p-0 text-xs text-primary">
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-xs text-primary"
+                    onClick={() => handleOpenDialog(program.id, program.program, "sessions")}
+                  >
                     View full schedule
                     <ChevronRight className="ml-1 h-3 w-3" />
                   </Button>
