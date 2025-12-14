@@ -7,25 +7,34 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Scale } from "lucide-react"
+import { Scale, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function FacilitatorLoginForm() {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
 
-    // Simulate authentication
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 800))
 
-    // Navigate to facilitator dashboard
-    router.push("/")
+    // Validate credentials
+    if (email.toLowerCase() === "martin@dmsclinicalservices.com" && password === "Archer1958") {
+      // Success
+      router.push("/facilitator/dashboard")
+    } else {
+      setError("Invalid email or password.")
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -39,12 +48,20 @@ export function FacilitatorLoginForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <Input
               id="email"
               type="email"
-              placeholder="facilitator@example.com"
+              placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
