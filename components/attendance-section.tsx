@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { QrCode, UserCheck, UserX } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { QrCode, UserCheck, UserX, Plus } from "lucide-react"
 import { useState } from "react"
 
 const participants = [
@@ -22,6 +23,9 @@ export function AttendanceSection() {
   const [showQR, setShowQR] = useState(false)
   const presentCount = participants.filter((p) => p.status === "present").length
 
+  const sessionId = "ps-s4-2024"
+  const checkinUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/participant/checkin/${sessionId}`
+
   return (
     <Card>
       <CardHeader>
@@ -32,27 +36,20 @@ export function AttendanceSection() {
               {presentCount} of {participants.length} participants present
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => setShowQR(!showQR)}>
-            <QrCode className="h-4 w-4" />
-            {showQR ? "Hide QR Code" : "Show QR Code"}
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+              <Plus className="h-4 w-4" />
+              Add Participant
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent" onClick={() => setShowQR(!showQR)}>
+              <QrCode className="h-4 w-4" />
+              {showQR ? "Hide" : "Show"} QR
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
       <CardContent>
-        {/* QR Code Section */}
-        {showQR && (
-          <div className="mb-6 flex flex-col items-center justify-center rounded-lg border-2 border-dashed bg-accent/50 p-8">
-            <div className="rounded-lg bg-white p-4 shadow-sm">
-              <QrCode className="h-32 w-32 text-primary" />
-            </div>
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              Participants can scan this code to check in
-            </p>
-            <p className="text-center text-xs text-muted-foreground">Session ID: PS-S4-2024</p>
-          </div>
-        )}
-
         {/* Attendance List */}
         <div className="space-y-2">
           {participants.map((participant) => (
@@ -89,6 +86,27 @@ export function AttendanceSection() {
           ))}
         </div>
       </CardContent>
+
+      <Dialog open={showQR} onOpenChange={setShowQR}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Check-In QR Code</DialogTitle>
+            <DialogDescription>Participants can scan this code to check in to the session</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center space-y-4 py-6">
+            <div className="rounded-lg bg-white p-6 shadow-lg">
+              <QrCode className="h-48 w-48 text-primary" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium">Session ID: {sessionId}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Check-in opens 10 minutes before class</p>
+            </div>
+            <Button variant="outline" size="sm" className="w-full bg-transparent">
+              Copy Check-In Link
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
