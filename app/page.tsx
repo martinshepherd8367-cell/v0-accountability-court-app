@@ -1,31 +1,31 @@
-import { DashboardHeader } from "@/components/dashboard-header"
-import { NextClassCard } from "@/components/next-class-card"
-import { ActiveProgramsList } from "@/components/active-programs-list"
-import { QuickStats } from "@/components/quick-stats"
-import { ParticipantMessages } from "@/components/participant-messages"
-import { HomeworkNotifications } from "@/components/homework-notifications"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
-export default function DashboardPage() {
-  return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
-
-      <main className="container mx-auto px-4 py-8 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* Main Content */}
-          <div className="flex-1 space-y-6">
-            <NextClassCard />
-            <ActiveProgramsList />
-            <ParticipantMessages />
-          </div>
-
-          {/* Sidebar */}
-          <aside className="space-y-6 lg:w-80">
-            <QuickStats />
-            <HomeworkNotifications />
-          </aside>
+export default function LandingPage() {
+    return (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+            <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                <div className="flex flex-col space-y-2 text-center">
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Accountability Court
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Select your role to continue
+                    </p>
+                </div>
+                <div className="flex flex-col gap-4">
+                    <Button asChild className="h-12 w-full text-lg" variant="default">
+                        <Link href="/facilitator/login">
+                            Facilitator Access
+                        </Link>
+                    </Button>
+                    <Button asChild className="h-12 w-full text-lg" variant="outline">
+                        <Link href="/participant/login">
+                            Participant Portal
+                        </Link>
+                    </Button>
+                </div>
+            </div>
         </div>
-      </main>
-    </div>
-  )
+    )
 }

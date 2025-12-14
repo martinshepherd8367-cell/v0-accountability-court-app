@@ -28,7 +28,7 @@ export function SessionHeader({
       <div className="container mx-auto px-4 py-4 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-4">
-            <Link href="/">
+            <Link href="/facilitator/dashboard">
               <Button variant="ghost" size="icon" className="shrink-0">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
