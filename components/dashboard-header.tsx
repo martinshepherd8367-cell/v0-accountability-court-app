@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { AddCurriculumDialog } from "@/components/add-curriculum-dialog"
+import { AIAssistantDialog } from "@/components/ai-assistant-dialog"
+import { ParticipantsByClassDialog } from "@/components/participants-by-class-dialog"
 
 export function DashboardHeader() {
   return (
@@ -10,10 +11,11 @@ export function DashboardHeader() {
           <p className="text-sm text-muted-foreground">Accountability Court Programs</p>
         </div>
 
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Program
-        </Button>
+        <div className="flex items-center gap-2">
+          <ParticipantsByClassDialog />
+          <AIAssistantDialog />
+          <AddCurriculumDialog />
+        </div>
       </div>
     </header>
   )

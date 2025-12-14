@@ -2,6 +2,8 @@ import { DashboardHeader } from "@/components/dashboard-header"
 import { NextClassCard } from "@/components/next-class-card"
 import { ActiveProgramsList } from "@/components/active-programs-list"
 import { QuickStats } from "@/components/quick-stats"
+import { ParticipantMessages } from "@/components/participant-messages"
+import { HomeworkNotifications } from "@/components/homework-notifications"
 
 export default function DashboardPage() {
   return (
@@ -14,11 +16,13 @@ export default function DashboardPage() {
           <div className="flex-1 space-y-6">
             <NextClassCard />
             <ActiveProgramsList />
+            <ParticipantMessages />
           </div>
 
           {/* Sidebar */}
-          <aside className="lg:w-80">
+          <aside className="space-y-6 lg:w-80">
             <QuickStats />
+            <HomeworkNotifications />
           </aside>
         </div>
       </main>
