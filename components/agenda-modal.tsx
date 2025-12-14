@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
 interface AgendaModalProps {
@@ -103,6 +104,15 @@ export function AgendaModal({ item, onClose, userRole = "facilitator" }: AgendaM
             })}
           </div>
         </div>
+
+        {/* Done button for facilitators */}
+        {userRole === "facilitator" && (
+          <div className="sticky bottom-0 border-t bg-background p-6">
+            <Button onClick={onClose} className="w-full" size="lg">
+              Done - Close Section for All Participants
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
