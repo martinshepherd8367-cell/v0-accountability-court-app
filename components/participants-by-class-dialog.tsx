@@ -49,86 +49,8 @@ export function ParticipantsByClassDialog() {
         } catch (e) {
           console.error("Failed to fetch participants:", e)
           // Fallback mock data
-          setParticipantsByClass({
-            "Prime Solutions": [
-              {
-                id: 1,
-                name: "Sarah Johnson",
-                email: "sarah.j@email.com",
-                phone: "(555) 123-4567",
-                status: "active" as const,
-                attendance: 95,
-                homeworkCompleted: 3,
-                lastActivity: "2 hours ago",
-                score: 87,
-                scoreTrend: "up" as const,
-              },
-              {
-                id: 2,
-                name: "Michael Chen",
-                email: "m.chen@email.com",
-                phone: "(555) 234-5678",
-                status: "active" as const,
-                attendance: 100,
-                homeworkCompleted: 4,
-                lastActivity: "1 day ago",
-                score: 92,
-                scoreTrend: "stable" as const,
-              },
-              {
-                id: 3,
-                name: "David Martinez",
-                email: "d.martinez@email.com",
-                phone: "(555) 345-6789",
-                status: "at-risk" as const,
-                attendance: 70,
-                homeworkCompleted: 1,
-                lastActivity: "5 days ago",
-                score: 58,
-                scoreTrend: "down" as const,
-              },
-            ],
-            "CoDA Recovery Program": [
-              {
-                id: 4,
-                name: "Emily Wilson",
-                email: "e.wilson@email.com",
-                phone: "(555) 456-7890",
-                status: "active" as const,
-                attendance: 90,
-                homeworkCompleted: 2,
-                lastActivity: "3 hours ago",
-                score: 84,
-                scoreTrend: "up" as const,
-              },
-              {
-                id: 5,
-                name: "James Brown",
-                email: "j.brown@email.com",
-                phone: "(555) 567-8901",
-                status: "pending" as const,
-                attendance: 50,
-                homeworkCompleted: 0,
-                lastActivity: "1 week ago",
-                score: 45,
-                scoreTrend: "down" as const,
-              },
-            ],
-            "Anger Management": [
-              {
-                id: 6,
-                name: "Lisa Anderson",
-                email: "l.anderson@email.com",
-                phone: "(555) 678-9012",
-                status: "active" as const,
-                attendance: 85,
-                homeworkCompleted: 5,
-                lastActivity: "4 hours ago",
-                score: 89,
-                scoreTrend: "up" as const,
-              },
-            ],
-          })
+          // Don't use fallback mock data to respect "remove fake data" request
+          setParticipantsByClass({})
         } finally {
           setLoading(false)
         }

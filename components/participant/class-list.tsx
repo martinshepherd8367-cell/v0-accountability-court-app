@@ -32,34 +32,8 @@ export function ClassList() {
         console.error("Failed to fetch classes:", err)
         setError("Could not load classes. Please try again later.")
         // Fallback to mock data for demonstration if API fails/doesn't exist yet
-        setClasses([
-          {
-            id: 1,
-            name: "Prime for Life - Monday Group",
-            nextSession: "Today, 2:00 PM",
-            progress: 6,
-            totalSessions: 12,
-            hasHomework: true,
-            homeworkDue: "Tomorrow",
-          },
-          {
-            id: 2,
-            name: "Cognitive Restructuring",
-            nextSession: "Wednesday, 10:00 AM",
-            progress: 3,
-            totalSessions: 8,
-            hasHomework: false,
-          },
-          {
-            id: 3,
-            name: "CoDA Recovery Program",
-            nextSession: "Friday, 3:00 PM",
-            progress: 10,
-            totalSessions: 16,
-            hasHomework: true,
-            homeworkDue: "In 3 days",
-          },
-        ])
+        // Fallback to empty to respect "remove fake data"
+        setClasses([])
       } finally {
         setLoading(false)
       }

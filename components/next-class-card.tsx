@@ -42,12 +42,12 @@ export function NextClassCard() {
           </div>
 
           {/* Action Button */}
-          <Link href="/session/ps-session-4">
-            <Button className="w-full gap-2" size="lg">
+          <Button className="w-full gap-2" size="lg" asChild>
+            <Link href="/session/ps-session-4">
               <Play className="h-4 w-4" />
               Start Class Session
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
