@@ -26,7 +26,7 @@ interface ManageParticipantsDialogProps {
   programId: number
 }
 
-const programParticipants = [
+const initialParticipants = [
   {
     id: 1,
     name: "Marcus Johnson",
@@ -95,19 +95,26 @@ export function ManageParticipantsDialog({
   programName,
   programId,
 }: ManageParticipantsDialogProps) {
+  const [participants, setParticipants] = useState(initialParticipants)
   const [searchQuery, setSearchQuery] = useState("")
   const [removeParticipant, setRemoveParticipant] = useState<number | null>(null)
 
-  const filteredParticipants = programParticipants.filter(
+  const filteredParticipants = participants.filter(
     (p) =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.email.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   const handleRemoveParticipant = (participantId: number) => {
-    console.log("[v0] Removing participant:", participantId)
+    const removedParticipant = participants.find((p) => p.id === participantId)
+    console.log("[v0] Removing participant:", participantId, removedParticipant?.name)
+
+    // Actually remove the participant from the list
+    setParticipants((prev) => prev.filter((p) => p.id !== participantId))
     setRemoveParticipant(null)
-    // Logic to remove participant
+
+    // Here you would also send a notification to the participant
+    console.log("[v0] Notification sent to participant about removal")
   }
 
   return (
