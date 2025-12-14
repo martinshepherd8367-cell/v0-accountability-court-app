@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Users, Search, Mail, Phone, CheckCircle2, AlertCircle, Clock } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ParticipantScoreBadge } from "@/components/participant-score-badge"
 
 type Participant = {
   id: number
@@ -26,6 +27,8 @@ type Participant = {
   attendance: number
   homeworkCompleted: number
   lastActivity: string
+  score: number
+  scoreTrend: "up" | "down" | "stable"
 }
 
 const participantsByClass = {
@@ -39,6 +42,8 @@ const participantsByClass = {
       attendance: 95,
       homeworkCompleted: 3,
       lastActivity: "2 hours ago",
+      score: 87,
+      scoreTrend: "up" as const,
     },
     {
       id: 2,
@@ -49,6 +54,8 @@ const participantsByClass = {
       attendance: 100,
       homeworkCompleted: 4,
       lastActivity: "1 day ago",
+      score: 92,
+      scoreTrend: "stable" as const,
     },
     {
       id: 3,
@@ -59,6 +66,8 @@ const participantsByClass = {
       attendance: 70,
       homeworkCompleted: 1,
       lastActivity: "5 days ago",
+      score: 58,
+      scoreTrend: "down" as const,
     },
   ],
   "CoDA Recovery Program": [
@@ -71,6 +80,8 @@ const participantsByClass = {
       attendance: 90,
       homeworkCompleted: 2,
       lastActivity: "3 hours ago",
+      score: 84,
+      scoreTrend: "up" as const,
     },
     {
       id: 5,
@@ -81,6 +92,8 @@ const participantsByClass = {
       attendance: 50,
       homeworkCompleted: 0,
       lastActivity: "1 week ago",
+      score: 45,
+      scoreTrend: "down" as const,
     },
   ],
   "Anger Management": [
@@ -93,6 +106,8 @@ const participantsByClass = {
       attendance: 85,
       homeworkCompleted: 5,
       lastActivity: "4 hours ago",
+      score: 89,
+      scoreTrend: "up" as const,
     },
   ],
 }
@@ -196,10 +211,17 @@ export function ParticipantsByClassDialog() {
                                 </div>
                               </div>
                             </div>
-                            {getStatusBadge(participant.status)}
+                            <div className="flex items-center gap-2">
+                              {getStatusBadge(participant.status)}
+                              <ParticipantScoreBadge score={participant.score} trend={participant.scoreTrend} />
+                            </div>
                           </div>
 
-                          <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="grid grid-cols-4 gap-4 text-sm">
+                            <div>
+                              <p className="text-muted-foreground">Overall Score</p>
+                              <p className="font-medium text-foreground">{participant.score}/100</p>
+                            </div>
                             <div>
                               <p className="text-muted-foreground">Attendance</p>
                               <p className="font-medium text-foreground">{participant.attendance}%</p>
