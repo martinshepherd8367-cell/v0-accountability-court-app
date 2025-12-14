@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { apiRequest } from "@/lib/api"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,38 +18,69 @@ import { Label } from "@/components/ui/label"
 import { MessageSquare, Send } from "lucide-react"
 
 export function MessageFacilitator() {
+  const [facilitators, setFacilitators] = useState<{ id: string; name: string; class: string; messages: any[] }[]>([])
   const [selectedFacilitator, setSelectedFacilitator] = useState<string>("")
   const [newMessage, setNewMessage] = useState("")
 
-  // Mock data - will be replaced with real data
-  const facilitators = [
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      class: "Prime Solutions",
-      messages: [
-        { from: "facilitator", content: "Great progress this week!", timestamp: "2 days ago" },
-        { from: "participant", content: "Thank you! I have a question about homework.", timestamp: "1 day ago" },
-      ],
-    },
-    {
-      id: "2",
-      name: "Michael Chen",
-      class: "CoDA Recovery",
-      messages: [
-        { from: "participant", content: "Can we review boundaries?", timestamp: "3 days ago" },
-        { from: "facilitator", content: "Let's discuss in next session.", timestamp: "3 days ago" },
-      ],
-    },
-  ]
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        // TODO: Real API
+        const data = await apiRequest<{ id: string; name: string; class: string; messages: any[] }[]>('/api/participant/facilitators')
+        setFacilitators(data)
+      } catch (e) {
+        console.error("Failed to fetch messages:", e)
+        // Fallback
+        setFacilitators([
+          {
+            id: "1",
+            name: "Sarah Johnson",
+            class: "Prime Solutions",
+            messages: [
+              { from: "facilitator", content: "Great progress this week!", timestamp: "2 days ago" },
+              { from: "participant", content: "Thank you! I have a question about homework.", timestamp: "1 day ago" },
+            ],
+          },
+          {
+            id: "2",
+            name: "Michael Chen",
+            class: "CoDA Recovery",
+            messages: [
+              { from: "participant", content: "Can we review boundaries?", timestamp: "3 days ago" },
+              { from: "facilitator", content: "Let's discuss in next session.", timestamp: "3 days ago" },
+            ],
+          },
+        ])
+      }
+    }
+    fetchMessages()
+  }, [])
 
-  const selectedFacilitatorData = facilitators.find((f) => f.id === selectedFacilitator)
+  const selectedFacilitatorData = facilitators.find((f) => String(f.id) === selectedFacilitator)
 
-  const handleSend = () => {
-    if (!newMessage.trim()) return
-    // TODO: Send message
-    console.log("Message sent:", { facilitatorId: selectedFacilitator, message: newMessage })
+  const handleSend = async () => {
+    if (!newMessage.trim() || !selectedFacilitator) return
+
+    // Optimistic update
+    const msg = { from: "participant", content: newMessage, timestamp: "Just now" }
+    const updatedFacilitators = facilitators.map(f => {
+      if (f.id === selectedFacilitator) {
+        return { ...f, messages: [...f.messages, msg] }
+      }
+      return f
+    })
+    setFacilitators(updatedFacilitators)
     setNewMessage("")
+
+    try {
+      await apiRequest('/api/participant/messages', {
+        method: 'POST',
+        body: JSON.stringify({ facilitatorId: selectedFacilitator, content: newMessage })
+      })
+    } catch (e) {
+      console.error("Failed to send message:", e)
+      // Revert? Or show error.
+    }
   }
 
   return (
@@ -108,11 +140,10 @@ export function MessageFacilitator() {
                       <div key={i} className={`flex ${msg.from === "participant" ? "justify-end" : "justify-start"}`}>
                         <div className="max-w-[80%] space-y-1">
                           <div
-                            className={`rounded-lg px-4 py-2 ${
-                              msg.from === "participant"
-                                ? "bg-primary text-primary-foreground"
-                                : "bg-muted text-foreground"
-                            }`}
+                            className={`rounded-lg px-4 py-2 ${msg.from === "participant"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-foreground"
+                              }`}
                           >
                             <p className="text-sm">{msg.content}</p>
                           </div>

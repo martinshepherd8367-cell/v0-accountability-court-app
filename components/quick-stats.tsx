@@ -21,10 +21,10 @@ const stats = [
     description: "2 completed",
   },
   {
-    label: "Program Progress",
-    value: "65%",
+    label: "Facilitator Effectiveness",
+    value: "92",
     icon: TrendingUp,
-    description: "Overall average",
+    description: "AI Generated Score (Admin View)",
   },
 ]
 

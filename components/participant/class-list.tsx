@@ -1,41 +1,81 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle2, AlertCircle } from "lucide-react"
+import { Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { apiRequest } from "@/lib/api"
 
-// Mock data - will be replaced with real data
-const classes = [
-  {
-    id: 1,
-    name: "Prime for Life - Monday Group",
-    nextSession: "Today, 2:00 PM",
-    progress: 6,
-    totalSessions: 12,
-    hasHomework: true,
-    homeworkDue: "Tomorrow",
-  },
-  {
-    id: 2,
-    name: "Cognitive Restructuring",
-    nextSession: "Wednesday, 10:00 AM",
-    progress: 3,
-    totalSessions: 8,
-    hasHomework: false,
-  },
-  {
-    id: 3,
-    name: "CoDA Recovery Program",
-    nextSession: "Friday, 3:00 PM",
-    progress: 10,
-    totalSessions: 16,
-    hasHomework: true,
-    homeworkDue: "In 3 days",
-  },
-]
+interface ClassItem {
+  id: number | string
+  name: string
+  nextSession: string
+  progress: number
+  totalSessions: number
+  hasHomework: boolean
+  homeworkDue?: string
+}
 
 export function ClassList() {
+  const [classes, setClasses] = useState<ClassItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        // TODO: Validate this endpoint with the backend team
+        const data = await apiRequest<ClassItem[]>('/api/participant/classes')
+        setClasses(data)
+      } catch (err) {
+        console.error("Failed to fetch classes:", err)
+        setError("Could not load classes. Please try again later.")
+        // Fallback to mock data for demonstration if API fails/doesn't exist yet
+        setClasses([
+          {
+            id: 1,
+            name: "Prime for Life - Monday Group",
+            nextSession: "Today, 2:00 PM",
+            progress: 6,
+            totalSessions: 12,
+            hasHomework: true,
+            homeworkDue: "Tomorrow",
+          },
+          {
+            id: 2,
+            name: "Cognitive Restructuring",
+            nextSession: "Wednesday, 10:00 AM",
+            progress: 3,
+            totalSessions: 8,
+            hasHomework: false,
+          },
+          {
+            id: 3,
+            name: "CoDA Recovery Program",
+            nextSession: "Friday, 3:00 PM",
+            progress: 10,
+            totalSessions: 16,
+            hasHomework: true,
+            homeworkDue: "In 3 days",
+          },
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchClasses()
+  }, [])
+
+  if (loading) {
+    return <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+  }
+
+  if (error && classes.length === 0) {
+    return <div className="text-destructive p-4 border border-destructive/20 rounded-md bg-destructive/10">{error}</div>
+  }
+
   return (
     <div className="space-y-4">
       {classes.map((classItem) => (

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { MessageCircle, Send, Clock } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { apiRequest } from "@/lib/api"
 
 export function AIAssistantDialog() {
   const [question, setQuestion] = useState("")
@@ -41,23 +42,40 @@ export function AIAssistantDialog() {
     },
   ]
 
-  const handleAsk = () => {
-    if (!question.trim()) return
+  const [loading, setLoading] = useState(false)
 
-    setMessages([...messages, { role: "user", content: question }])
+  const handleAsk = async () => {
+    if (!question.trim() || loading) return
 
-    setTimeout(() => {
+    const userMessage = question
+    setQuestion("")
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    setLoading(true)
+
+    try {
+      // TODO: Verify endpoint with backend
+      const response = await apiRequest<{ reply: string }>('/api/participant/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message: userMessage }),
+      })
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "ai", content: response.reply },
+      ])
+    } catch (err) {
+      console.error("AI Chat Error:", err)
+      // Fallback for demo if API fails
       setMessages((prev) => [
         ...prev,
         {
           role: "ai",
-          content:
-            "I'm here to help explain concepts from your class. Could you tell me more about what you'd like to understand better?",
+          content: "I'm having trouble connecting to the server right now. Implementation Note: Ensure POST /api/participant/chat is implemented.",
         },
       ])
-    }, 500)
-
-    setQuestion("")
+    } finally {
+      setLoading(false)
+    }
   }
 
   const loadChat = (chatId: string) => {
@@ -120,9 +138,8 @@ export function AIAssistantDialog() {
                   messages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                       <div
-                        className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                          msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                        }`}
+                        className={`max-w-[80%] rounded-lg px-4 py-2 ${msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
+                          }`}
                       >
                         <p className="text-sm">{msg.content}</p>
                       </div>

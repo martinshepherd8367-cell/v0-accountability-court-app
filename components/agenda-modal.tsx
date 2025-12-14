@@ -6,12 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 
 interface AgendaModalProps {
-  item: {
-    duration: string
-    title: string
-    description: string
-    content: string
-  }
+  item: any
   onClose: () => void
   userRole?: "facilitator" | "participant"
 }
@@ -55,54 +50,87 @@ export function AgendaModal({ item, onClose, userRole = "facilitator" }: AgendaM
 
         {/* Content */}
         <div className="p-6">
-          <div className="prose prose-sm max-w-none dark:prose-invert">
-            {item.content.split("\n").map((line, index) => {
-              const trimmedLine = line.trim()
+          {item.content ? (
+            <div className="prose prose-sm max-w-none dark:prose-invert">
+              {item.content.split("\n").map((line: string, index: number) => {
+                const trimmedLine = line.trim()
 
-              if (!trimmedLine) return <div key={index} className="h-4" />
+                if (!trimmedLine) return <div key={index} className="h-4" />
 
-              if (trimmedLine.startsWith("**") && trimmedLine.endsWith("**")) {
-                const text = trimmedLine.slice(2, -2)
-                if (text.includes(":")) {
-                  const [label, value] = text.split(":")
+                if (trimmedLine.startsWith("**") && trimmedLine.endsWith("**")) {
+                  const text = trimmedLine.slice(2, -2)
+                  if (text.includes(":")) {
+                    const [label, value] = text.split(":")
+                    return (
+                      <div key={index} className="mb-2 mt-4">
+                        <strong className="text-primary">{label}:</strong>
+                        {value && <span>{value}</span>}
+                      </div>
+                    )
+                  }
                   return (
-                    <div key={index} className="mb-2 mt-4">
-                      <strong className="text-primary">{label}:</strong>
-                      {value && <span>{value}</span>}
+                    <h3 key={index} className="mb-2 mt-4 text-lg font-semibold text-primary">
+                      {text}
+                    </h3>
+                  )
+                }
+
+                if (trimmedLine.match(/^\d+\./)) {
+                  return (
+                    <div key={index} className="ml-4 mb-1">
+                      {trimmedLine}
                     </div>
                   )
                 }
-                return (
-                  <h3 key={index} className="mb-2 mt-4 text-lg font-semibold text-primary">
-                    {text}
-                  </h3>
-                )
-              }
 
-              if (trimmedLine.match(/^\d+\./)) {
+                if (trimmedLine.startsWith("-")) {
+                  return (
+                    <div key={index} className="ml-6 mb-1 flex gap-2">
+                      <span>•</span>
+                      <span>{trimmedLine.slice(1).trim()}</span>
+                    </div>
+                  )
+                }
+
                 return (
-                  <div key={index} className="ml-4 mb-1">
+                  <p key={index} className="mb-2">
                     {trimmedLine}
-                  </div>
+                  </p>
                 )
-              }
-
-              if (trimmedLine.startsWith("-")) {
-                return (
-                  <div key={index} className="ml-6 mb-1 flex gap-2">
-                    <span>•</span>
-                    <span>{trimmedLine.slice(1).trim()}</span>
+              })}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Fallback for Structured Data (keyPoints, video, etc) */}
+              {item.keyPoints && (
+                <div>
+                  <h3 className="mb-2 text-lg font-semibold text-primary">Key Points</h3>
+                  <ul className="space-y-2 text-sm">
+                    {item.keyPoints.map((point: string, i: number) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {item.video && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-primary">Video: {item.video.title}</div>
+                  <div className="aspect-video rounded-lg overflow-hidden border bg-muted">
+                    <iframe
+                      src={item.video.url}
+                      title={item.video.title}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
                   </div>
-                )
-              }
-
-              return (
-                <p key={index} className="mb-2">
-                  {trimmedLine}
-                </p>
-              )
-            })}
-          </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Done button for facilitators */}

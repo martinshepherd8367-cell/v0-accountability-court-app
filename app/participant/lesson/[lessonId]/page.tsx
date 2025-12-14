@@ -1,4 +1,6 @@
 "use client"
+import { useState, useEffect } from "react"
+import { apiRequest } from "@/lib/api"
 
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,60 +12,82 @@ import Link from "next/link"
 export default function ParticipantLessonPage() {
   const params = useParams()
 
-  const lessonData = {
-    title: "Cognitive Restructuring Basics",
-    program: "Prime for Life - Monday Group",
-    date: "Jan 29, 2025",
-    duration: "2 hours",
-    facilitator: "Dr. Sarah Mitchell",
-  }
+  const [lessonData, setLessonData] = useState<any>(null)
+  const [content, setContent] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const content = [
-    {
-      title: "Introduction to Cognitive Restructuring",
-      description: "Understanding how our thoughts influence our feelings and behaviors",
-      keyPoints: [
-        "Automatic thoughts happen instantly and unconsciously",
-        "Thoughts are not facts - they can be challenged",
-        "The ABC model: Activating event → Belief → Consequence",
-      ],
-      video: {
-        title: "Cognitive Restructuring Explained",
-        url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      },
-    },
-    {
-      title: "Common Cognitive Distortions",
-      description: "Recognizing patterns of negative thinking",
-      keyPoints: [
-        "All-or-nothing thinking: Seeing things as only good or bad",
-        "Catastrophizing: Expecting the worst possible outcome",
-        "Personalization: Blaming yourself for things outside your control",
-        "Mind reading: Assuming you know what others think",
-      ],
-    },
-    {
-      title: "The Thought Record Technique",
-      description: "A structured approach to challenging negative thoughts",
-      keyPoints: [
-        "Step 1: Identify the triggering situation",
-        "Step 2: Notice automatic thoughts",
-        "Step 3: Rate emotional intensity",
-        "Step 4: Find evidence for and against the thought",
-        "Step 5: Create a balanced alternative thought",
-      ],
-    },
-    {
-      title: "Practice Exercise",
-      description: "Apply what you learned with a real-life example",
-      keyPoints: [
-        "Think of a recent situation that upset you",
-        "Write down your automatic thoughts",
-        "Challenge those thoughts with evidence",
-        "Develop a more balanced perspective",
-      ],
-    },
-  ]
+  useEffect(() => {
+    const fetchLesson = async () => {
+      try {
+        // TODO: Use real API
+        const data = await apiRequest<any>(`/api/participant/lessons/${params.lessonId}`)
+        setLessonData(data.lessonData)
+        setContent(data.content)
+      } catch (e) {
+        console.error("Failed to fetch lesson:", e)
+        // Fallback
+        setLessonData({
+          title: "Cognitive Restructuring Basics",
+          program: "Prime for Life - Monday Group",
+          date: "Jan 29, 2025",
+          duration: "2 hours",
+          facilitator: "Dr. Sarah Mitchell",
+        })
+
+        setContent([
+          {
+            title: "Introduction to Cognitive Restructuring",
+            description: "Understanding how our thoughts influence our feelings and behaviors",
+            keyPoints: [
+              "Automatic thoughts happen instantly and unconsciously",
+              "Thoughts are not facts - they can be challenged",
+              "The ABC model: Activating event → Belief → Consequence",
+            ],
+            video: {
+              title: "Cognitive Restructuring Explained",
+              url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            },
+          },
+          {
+            title: "Common Cognitive Distortions",
+            description: "Recognizing patterns of negative thinking",
+            keyPoints: [
+              "All-or-nothing thinking: Seeing things as only good or bad",
+              "Catastrophizing: Expecting the worst possible outcome",
+              "Personalization: Blaming yourself for things outside your control",
+              "Mind reading: Assuming you know what others think",
+            ],
+          },
+          {
+            title: "The Thought Record Technique",
+            description: "A structured approach to challenging negative thoughts",
+            keyPoints: [
+              "Step 1: Identify the triggering situation",
+              "Step 2: Notice automatic thoughts",
+              "Step 3: Rate emotional intensity",
+              "Step 4: Find evidence for and against the thought",
+              "Step 5: Create a balanced alternative thought",
+            ],
+          },
+          {
+            title: "Practice Exercise",
+            description: "Apply what you learned with a real-life example",
+            keyPoints: [
+              "Think of a recent situation that upset you",
+              "Write down your automatic thoughts",
+              "Challenge those thoughts with evidence",
+              "Develop a more balanced perspective",
+            ],
+          },
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchLesson()
+  }, [params.lessonId])
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading lesson...</div>
 
   return (
     <div className="min-h-screen bg-background">

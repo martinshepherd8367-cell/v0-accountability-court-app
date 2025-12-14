@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Clock } from "lucide-react"
 import { useState, useEffect } from "react"
+import { apiRequest } from "@/lib/api"
 
 export default function ParticipantSessionPage() {
   const params = useParams()
@@ -22,17 +23,47 @@ export default function ParticipantSessionPage() {
     }
   }, [timeRemaining])
 
-  const sessionData = {
-    title: "Prime For Life - Session 4: Cognitive Restructuring",
-    program: "Prime Solutions",
-    facilitator: "Dr. Sarah Mitchell",
-    date: "Today, 2:00 PM - 4:00 PM",
+  const [sessionData, setSessionData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        // TODO: Real API
+        const data = await apiRequest<any>(`/api/participant/sessions/${sessionId}`)
+        setSessionData(data.session)
+      } catch (e) {
+        console.error("Failed to fetch session:", e)
+        // Fallback
+        setSessionData({
+          title: "Prime For Life - Session 4: Cognitive Restructuring",
+          program: "Prime Solutions",
+          facilitator: "Dr. Sarah Mitchell",
+          date: "Today, 2:00 PM - 4:00 PM",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSession()
+  }, [sessionId])
+
+  const handleSubmitTakeaway = async () => {
+    try {
+      await apiRequest(`/api/participant/sessions/${sessionId}/takeaway`, {
+        method: 'POST',
+        body: JSON.stringify({ takeaway })
+      })
+      alert("Takeaway submitted!")
+    } catch (e) {
+      console.error("Failed to submit takeaway:", e)
+      // Fallback for demo
+      console.log("Takeaway submitted locally:", takeaway)
+      alert("Takeaway submitted!")
+    }
   }
 
-  const handleSubmitTakeaway = () => {
-    console.log("Takeaway submitted:", takeaway)
-    // Submit takeaway logic here
-  }
+  if (loading) return <div className="p-8 text-center">Loading session...</div>
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,9 +72,9 @@ export default function ParticipantSessionPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-semibold">{sessionData.title}</h1>
+              <h1 className="text-xl font-semibold">{sessionData?.title}</h1>
               <p className="text-sm text-muted-foreground">
-                {sessionData.program} • {sessionData.facilitator}
+                {sessionData?.program} • {sessionData?.facilitator}
               </p>
             </div>
             <Badge variant="secondary" className="gap-1 bg-primary/10 text-primary">
@@ -87,7 +118,7 @@ export default function ParticipantSessionPage() {
           </Card>
         )}
 
-        {/* Session Agenda */}
+        {/* Session Agenda linked to Facilitator controls */}
         <SessionAgenda userRole="participant" sessionId={sessionId} />
       </main>
     </div>

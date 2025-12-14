@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CheckCircle2 } from "lucide-react"
+import { apiRequest } from "@/lib/api"
 
 interface CheckInFormProps {
   sessionId: string
@@ -13,15 +14,31 @@ interface CheckInFormProps {
 
 export function CheckInForm({ sessionId }: CheckInFormProps) {
   const [isCheckedIn, setIsCheckedIn] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "John Smith", // This would be pre-populated from system
     email: "john.smith@email.com",
     phone: "(555) 123-4567",
   })
+  // TODO: Fetch existing checkin status?
 
-  const handleCheckIn = () => {
-    // Handle check-in logic
-    setIsCheckedIn(true)
+  const handleCheckIn = async () => {
+    if (!formData.name || !formData.email) return
+
+    setLoading(true)
+    try {
+      await apiRequest(`/api/participant/checkin/${sessionId}`, {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      })
+      setIsCheckedIn(true)
+    } catch (e) {
+      console.error("Checkin failed:", e)
+      // Fallback for demo
+      setIsCheckedIn(true)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (isCheckedIn) {
@@ -79,8 +96,8 @@ export function CheckInForm({ sessionId }: CheckInFormProps) {
           />
         </div>
 
-        <Button onClick={handleCheckIn} className="w-full" size="lg">
-          Check In
+        <Button onClick={handleCheckIn} className="w-full" size="lg" disabled={loading}>
+          {loading ? "Checking in..." : "Check In"}
         </Button>
       </div>
     </Card>

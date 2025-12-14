@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { apiRequest } from "@/lib/api"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,14 +21,31 @@ export function DailyJournal() {
   const [selectedClass, setSelectedClass] = useState<string>("")
   const [journalEntry, setJournalEntry] = useState("")
 
-  // Mock data - will be replaced with real data
-  const classes = [
-    { id: "1", name: "Prime Solutions - Cognitive Restructuring", journalType: "Trigger Log" },
-    { id: "2", name: "CoDA Recovery - Boundaries", journalType: "DBT Emotional Regulation" },
-    { id: "3", name: "Anger Management Essentials", journalType: "Daily Reflection" },
-  ]
+  const [classes, setClasses] = useState<{ id: string; name: string; journalType: string }[]>([])
+  const [loading, setLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const selectedClassData = classes.find((c) => c.id === selectedClass)
+  // Fetch classes on mount
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        // TODO: Use real endpoint
+        const data = await apiRequest<{ id: string; name: string; journalType: string }[]>('/api/participant/classes')
+        setClasses(data)
+      } catch (error) {
+        console.error("Failed to fetch classes for journal:", error)
+        // Fallback mock data
+        setClasses([
+          { id: "1", name: "Prime Solutions - Cognitive Restructuring", journalType: "Trigger Log" },
+          { id: "2", name: "CoDA Recovery - Boundaries", journalType: "DBT Emotional Regulation" },
+          { id: "3", name: "Anger Management Essentials", journalType: "Daily Reflection" },
+        ])
+      }
+    }
+    fetchClasses()
+  }, [])
+
+  const selectedClassData = classes.find((c) => String(c.id) === selectedClass)
 
   const getJournalPrompt = (journalType: string) => {
     switch (journalType) {
@@ -42,10 +60,27 @@ export function DailyJournal() {
     }
   }
 
-  const handleSubmit = () => {
-    // TODO: Submit journal entry
-    console.log("Journal submitted:", { classId: selectedClass, entry: journalEntry })
-    setJournalEntry("")
+  const handleSubmit = async () => {
+    if (!selectedClass || !journalEntry.trim()) return
+
+    setIsSubmitting(true)
+    try {
+      await apiRequest('/api/participant/journal', {
+        method: 'POST',
+        body: JSON.stringify({
+          classId: selectedClass,
+          entry: journalEntry,
+          date: new Date().toISOString()
+        })
+      })
+      setJournalEntry("")
+      // Close dialog? We might need to handle open state
+    } catch (error) {
+      console.error("Failed to submit journal:", error)
+      alert("Failed to save journal entry. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
