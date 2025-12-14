@@ -1,6 +1,7 @@
 import { AddCurriculumDialog } from "@/components/add-curriculum-dialog"
 import { AIAssistantDialog } from "@/components/ai-assistant-dialog"
 import { ParticipantsByClassDialog } from "@/components/participants-by-class-dialog"
+import { UploadClassDialog } from "@/components/upload-class-dialog"
 
 export function DashboardHeader() {
   return (
@@ -12,6 +13,7 @@ export function DashboardHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <UploadClassDialog />
           <ParticipantsByClassDialog />
           <AIAssistantDialog />
           <AddCurriculumDialog />
