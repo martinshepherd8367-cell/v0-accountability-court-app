@@ -3,12 +3,54 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { AgendaModal } from "./agenda-modal"
+import { sessionSync } from "@/lib/session-sync"
 
-export function SessionAgenda() {
+interface SessionAgendaProps {
+  userRole?: "facilitator" | "participant"
+  sessionId?: string
+}
+
+export function SessionAgenda({ userRole = "facilitator", sessionId = "session-1" }: SessionAgendaProps) {
   const [isExpanded, setIsExpanded] = useState(true)
   const [selectedItem, setSelectedItem] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (userRole === "participant") {
+      const unsubscribe = sessionSync.subscribe((data) => {
+        if (data.sessionId === sessionId) {
+          console.log("[v0] Participant received section update:", data.activeSection)
+          setSelectedItem(data.activeSection)
+        }
+      })
+      return unsubscribe
+    }
+  }, [userRole, sessionId])
+
+  const handleSectionClick = (itemId: string) => {
+    setSelectedItem(itemId)
+
+    if (userRole === "facilitator") {
+      console.log("[v0] Facilitator opening section:", itemId)
+      sessionSync.broadcast({
+        sessionId,
+        activeSection: itemId,
+      })
+    }
+  }
+
+  const handleCloseModal = () => {
+    setSelectedItem(null)
+
+    if (userRole === "facilitator") {
+      console.log("[v0] Facilitator closing section")
+      sessionSync.broadcast({
+        sessionId,
+        activeSection: null,
+      })
+    }
+  }
 
   const agendaItems = [
     {
@@ -170,7 +212,7 @@ export function SessionAgenda() {
                 {agendaItems.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setSelectedItem(item.id)}
+                    onClick={() => handleSectionClick(item.id)}
                     className="flex w-full gap-3 rounded-lg border p-3 text-left transition-colors hover:border-primary/50 hover:bg-accent/50"
                   >
                     <Badge variant="outline" className="h-6 shrink-0">
@@ -191,7 +233,8 @@ export function SessionAgenda() {
       {selectedItem && (
         <AgendaModal
           item={agendaItems.find((item) => item.id === selectedItem)!}
-          onClose={() => setSelectedItem(null)}
+          onClose={handleCloseModal}
+          userRole={userRole}
         />
       )}
     </>

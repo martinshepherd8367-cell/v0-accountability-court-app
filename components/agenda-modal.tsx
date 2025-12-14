@@ -12,9 +12,10 @@ interface AgendaModalProps {
     content: string
   }
   onClose: () => void
+  userRole?: "facilitator" | "participant"
 }
 
-export function AgendaModal({ item, onClose }: AgendaModalProps) {
+export function AgendaModal({ item, onClose, userRole = "facilitator" }: AgendaModalProps) {
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -36,12 +37,19 @@ export function AgendaModal({ item, onClose }: AgendaModalProps) {
             <div className="mb-2 flex items-center gap-3">
               <Badge variant="outline">{item.duration}</Badge>
               <h2 className="text-2xl font-semibold">{item.title}</h2>
+              {userRole === "participant" && (
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  Live
+                </Badge>
+              )}
             </div>
             <p className="text-muted-foreground">{item.description}</p>
           </div>
-          <button onClick={onClose} className="ml-4 rounded-lg p-2 hover:bg-accent" aria-label="Close modal">
-            <X className="h-5 w-5" />
-          </button>
+          {userRole === "facilitator" && (
+            <button onClick={onClose} className="ml-4 rounded-lg p-2 hover:bg-accent" aria-label="Close modal">
+              <X className="h-5 w-5" />
+            </button>
+          )}
         </div>
 
         {/* Content */}
