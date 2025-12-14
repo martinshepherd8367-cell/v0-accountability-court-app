@@ -124,3 +124,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Added QR scanner animation */
+@keyframes scan-line {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(256px);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 2s ease-in-out infinite;
+}

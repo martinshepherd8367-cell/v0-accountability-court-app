@@ -3,6 +3,7 @@ import { SessionAgenda } from "@/components/session-agenda"
 import { AttendanceSection } from "@/components/attendance-section"
 import { TakeawaysSection } from "@/components/takeaways-section"
 import { FacilitatorNotes } from "@/components/facilitator-notes"
+import { SessionVideoSection } from "@/components/session-video-section"
 
 export default function ClassSessionPage() {
   return (
@@ -16,6 +17,7 @@ export default function ClassSessionPage() {
             <SessionAgenda />
             <AttendanceSection />
             <TakeawaysSection />
+            <SessionVideoSection />
           </div>
 
           {/* Sidebar */}
