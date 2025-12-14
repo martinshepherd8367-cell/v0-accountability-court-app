@@ -2,8 +2,11 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, MapPin, Users, CheckCircle2, Circle, PlayCircle } from "lucide-react"
+import { Calendar, MapPin, Users, CheckCircle2, Circle, PlayCircle, BookOpen } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { primeSolutionsCurriculum } from "@/lib/curriculum-data"
+import { useState } from "react"
+import { SessionContentViewer } from "@/components/session-content-viewer"
 
 interface ViewSessionsDialogProps {
   open: boolean
@@ -296,6 +299,34 @@ const programSessions = {
 
 export function ViewSessionsDialog({ open, onOpenChange, programName, programId }: ViewSessionsDialogProps) {
   const sessions = programSessions[programId as keyof typeof programSessions] || []
+  const [selectedSession, setSelectedSession] = useState<number | null>(null)
+
+  if (selectedSession !== null) {
+    const curriculumData = primeSolutionsCurriculum.find((s) => s.id === selectedSession)
+
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedSession(null)} className="w-fit mb-2">
+              ← Back to All Sessions
+            </Button>
+            <DialogTitle>Session {selectedSession} Details</DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="h-[calc(90vh-120px)] pr-4">
+            {curriculumData ? (
+              <SessionContentViewer session={curriculumData} isFacilitator={true} />
+            ) : (
+              <div className="text-center text-muted-foreground py-12">
+                No curriculum content available for this session.
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -358,11 +389,24 @@ export function ViewSessionsDialog({ open, onOpenChange, programName, programId 
                     </div>
                   </div>
 
-                  {session.status === "active" && (
-                    <Button size="sm" variant="outline" className="mt-2 bg-transparent">
-                      Start Session
-                    </Button>
-                  )}
+                  <div className="flex gap-2 mt-2">
+                    {session.status === "active" && (
+                      <Button size="sm" variant="outline" className="bg-transparent">
+                        Start Session
+                      </Button>
+                    )}
+                    {programId === 1 && session.session <= 6 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedSession(session.session)}
+                        className="gap-1.5"
+                      >
+                        <BookOpen className="h-3.5 w-3.5" />
+                        View Guide
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
