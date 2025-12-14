@@ -29,8 +29,8 @@ export function FacilitatorLoginForm() {
 
     // Validate credentials
     if (email.toLowerCase() === "martin@dmsclinicalservices.com" && password === "Archer1958") {
-      // Success
-      router.push("/facilitator/dashboard")
+      // Success - Force hard navigation to ensure state reset
+      window.location.href = "/facilitator/dashboard"
     } else {
       setError("Invalid email or password.")
       setIsLoading(false)
