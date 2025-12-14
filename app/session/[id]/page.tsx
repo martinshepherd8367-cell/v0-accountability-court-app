@@ -3,8 +3,12 @@ import { SessionAgenda } from "@/components/session-agenda"
 import { AttendanceSection } from "@/components/attendance-section"
 import { TakeawaysSection } from "@/components/takeaways-section"
 import { FacilitatorNotes } from "@/components/facilitator-notes"
+import { SynchronizedVideoPlayer } from "@/components/synchronized-video-player"
 
 export default function ClassSessionPage() {
+  const userRole: "facilitator" | "participant" = "facilitator"
+  const sessionStatus: "active" | "ended" = "active"
+
   return (
     <div className="min-h-screen bg-background">
       <SessionHeader />
@@ -14,6 +18,7 @@ export default function ClassSessionPage() {
           {/* Main Content */}
           <div className="flex-1 space-y-6">
             <SessionAgenda />
+            <SynchronizedVideoPlayer userRole={userRole} sessionStatus={sessionStatus} />
             <AttendanceSection />
             <TakeawaysSection />
           </div>
