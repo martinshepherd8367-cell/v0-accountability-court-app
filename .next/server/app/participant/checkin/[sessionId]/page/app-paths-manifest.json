@@ -1,0 +1,3 @@
+{
+  "/participant/checkin/[sessionId]/page": "app/participant/checkin/[sessionId]/page.js"
+}
