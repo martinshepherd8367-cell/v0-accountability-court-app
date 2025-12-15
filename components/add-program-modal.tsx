@@ -10,12 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { X, Upload, FileText } from "lucide-react"
 
 
-const initialProgramTypes = [
+// Default library content
+const defaultProgramTypes = [
   { id: "prime-16", name: "Prime Solutions - 16 Sessions", sessions: 16 },
   { id: "coda-8", name: "CoDA Recovery - 8 Sessions", sessions: 8 },
   { id: "anger-10", name: "Anger Management - 10 Sessions", sessions: 10 },
   { id: "dbt-24", name: "DBT Skills - 24 Sessions", sessions: 24 },
 ]
+
+interface ProgramType {
+  id: string
+  name: string
+  sessions: number
+  customSessions?: any[]
+  description?: string
+}
 
 interface AddProgramModalProps {
   open: boolean
@@ -27,6 +36,7 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
   const [activeTab, setActiveTab] = useState("library")
 
   // Library State
+  const [libraryPrograms, setLibraryPrograms] = useState<ProgramType[]>(defaultProgramTypes)
   const [selectedType, setSelectedType] = useState<string>("")
 
   // Custom State
@@ -34,6 +44,30 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
   const [description, setDescription] = useState("")
   const [bulkInput, setBulkInput] = useState("")
   const [parseError, setParseError] = useState<string | null>(null)
+
+  // Load library from local storage on mount
+  useEffect(() => {
+    const savedLibrary = localStorage.getItem("accountability_program_library")
+    if (savedLibrary) {
+      try {
+        const parsed = JSON.parse(savedLibrary)
+        // Merge with defaults to ensure defaults always exist, or just use parsed if it includes them
+        // For simplicity, we'll assume the saved library is the source of truth if it exists
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setLibraryPrograms(parsed)
+        }
+      } catch (e) {
+        console.error("Failed to load program library", e)
+      }
+    }
+  }, [])
+
+  // Save library to local storage whenever it changes
+  useEffect(() => {
+    if (libraryPrograms !== defaultProgramTypes) {
+      localStorage.setItem("accountability_program_library", JSON.stringify(libraryPrograms))
+    }
+  }, [libraryPrograms])
 
   useEffect(() => {
     if (!open) {
@@ -49,13 +83,14 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
   const handleLibraryCreate = () => {
     if (!programName.trim() || !selectedType) return
 
-    const selectedProgram = initialProgramTypes.find((p) => p.id === selectedType)
+    const selectedProgram = libraryPrograms.find((p) => p.id === selectedType)
     if (selectedProgram && onAddProgram) {
       onAddProgram({
         programName,
         selectedType,
-        description,
+        description: description || selectedProgram.description || "",
         sessions: selectedProgram.sessions,
+        customSessions: selectedProgram.customSessions // Pass through custom sessions if this library item has them
       })
       onOpenChange(false)
     }
@@ -79,6 +114,7 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
         parsedSessions = lines.map((title, i) => ({ title, number: i + 1 }))
       }
 
+      // 1. Create the active program run
       const newProgramData = {
         programName,
         selectedType: "custom",
@@ -91,6 +127,18 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
       if (onAddProgram) {
         onAddProgram(newProgramData)
       }
+
+      // 2. Add to Library for future use
+      const newLibraryItem: ProgramType = {
+        id: `custom-${Date.now()}`,
+        name: programName,
+        sessions: sessionsCount,
+        customSessions: parsedSessions,
+        description: description
+      }
+
+      setLibraryPrograms(prev => [...prev, newLibraryItem])
+
       onOpenChange(false)
 
     } catch (e) {
@@ -138,7 +186,7 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
                     <SelectValue placeholder="Choose a class..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {initialProgramTypes.map((prog) => (
+                    {libraryPrograms.map((prog) => (
                       <SelectItem key={prog.id} value={prog.id}>
                         {prog.name}
                       </SelectItem>
@@ -150,7 +198,7 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
               {selectedType && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Total Sessions</label>
-                  <Input value={initialProgramTypes.find((p) => p.id === selectedType)?.sessions || ""} disabled className="bg-muted" />
+                  <Input value={libraryPrograms.find((p) => p.id === selectedType)?.sessions || ""} disabled className="bg-muted" />
                 </div>
               )}
             </div>
@@ -165,12 +213,13 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
           <TabsContent value="custom" className="space-y-6 py-4">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Program Name</label>
+                <label className="text-sm font-medium">Program Name / Library Title</label>
                 <Input
                   placeholder="e.g., Advanced CBT Intensive"
                   value={programName}
                   onChange={(e) => setProgramName(e.target.value)}
                 />
+                <p className="text-xs text-muted-foreground">This will be the name saved to the library.</p>
               </div>
 
               <div className="space-y-2">
@@ -205,7 +254,7 @@ export function AddProgramModal({ open, onOpenChange, onAddProgram }: AddProgram
               <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button onClick={handleCustomCreate} disabled={!programName}>
                 <Upload className="mr-2 h-4 w-4" />
-                Create Custom Program
+                Save to Library & Start
               </Button>
             </div>
           </TabsContent>
