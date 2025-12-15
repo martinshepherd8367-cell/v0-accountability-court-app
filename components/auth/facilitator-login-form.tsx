@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Scale, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function FacilitatorLoginForm() {
   const router = useRouter()
@@ -61,10 +60,10 @@ export function FacilitatorLoginForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
 
           {error && (
-            <Alert variant="destructive">
+            <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+              <span>{error}</span>
+            </div>
           )}
 
           <div className="space-y-2">
