@@ -32,9 +32,10 @@ interface ActiveProgramsListProps {
       location: string
     }>
   }>
+  onDeleteProgram?: (id: number) => void
 }
 
-export function ActiveProgramsList({ programs }: ActiveProgramsListProps) {
+export function ActiveProgramsList({ programs, onDeleteProgram }: ActiveProgramsListProps) {
   const [editScheduleOpen, setEditScheduleOpen] = useState(false)
   const [selectedProgram, setSelectedProgram] = useState<(typeof programs)[0] | null>(null)
 
@@ -82,7 +83,12 @@ export function ActiveProgramsList({ programs }: ActiveProgramsListProps) {
                         <DropdownMenuItem>View All Sessions</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEditSchedule(program)}>Edit Schedule</DropdownMenuItem>
                         <DropdownMenuItem>Manage Participants</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">End Program</DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => onDeleteProgram?.(program.id)}
+                        >
+                          End Program
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>

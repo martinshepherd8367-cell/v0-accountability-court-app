@@ -133,6 +133,12 @@ export default function DashboardPage() {
     console.log("[v0] Programs after add:", [...programs, addedProgram])
   }
 
+  const handleDeleteProgram = (programId: number) => {
+    if (confirm("Are you sure you want to delete this program? This action cannot be undone.")) {
+      setPrograms(programs.filter(p => p.id !== programId))
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader onAddProgram={handleAddProgram} />
@@ -142,7 +148,7 @@ export default function DashboardPage() {
           {/* Main Content */}
           <div className="flex-1 space-y-6">
             <NextClassCard />
-            <ActiveProgramsList programs={programs} />
+            <ActiveProgramsList programs={programs} onDeleteProgram={handleDeleteProgram} />
             <ParticipantMessagesSection />
             <HomeworkSubmissionsSection />
           </div>
