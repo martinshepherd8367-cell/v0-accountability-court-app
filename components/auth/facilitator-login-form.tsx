@@ -24,15 +24,26 @@ export function FacilitatorLoginForm() {
     setIsLoading(true)
     setError(null)
 
+    const cleanEmail = email.trim().toLowerCase()
+    const cleanPassword = password.trim()
+
+    console.log("Attempting login with:", cleanEmail)
+
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
-    // Validate credentials
-    if (email.toLowerCase() === "martin@dmsclinicalservices.com" && password === "Archer1958") {
-      // Success - Force hard navigation to ensure state reset
+    // Validate credentials (relaxed check)
+    // password: 'Archer1958' (case sensitive normally, but let's be safe and log it)
+    const isValidEmail = cleanEmail === "martin@dmsclinicalservices.com"
+    const isValidPassword = cleanPassword === "Archer1958"
+
+    if (isValidEmail && isValidPassword) {
+      console.log("Login successful! Redirecting to /facilitator/dashboard")
+      // Force hard redirect
       window.location.href = "/facilitator/dashboard"
     } else {
-      setError("Invalid email or password.")
+      console.error("Login failed. Email valid:", isValidEmail, "Password matches:", isValidPassword)
+      setError("Invalid email or password. Please try again.")
       setIsLoading(false)
     }
   }
