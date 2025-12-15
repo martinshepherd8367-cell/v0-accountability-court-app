@@ -103,14 +103,29 @@ export default function DashboardPage() {
   const handleAddProgram = (newProgram: any) => {
     console.log("[v0] handleAddProgram called with:", newProgram)
 
-    const programSessions = Array.from({ length: newProgram.sessions }, (_, i) => ({
-      id: i + 1,
-      number: i + 1,
-      title: `Session ${i + 1}`,
-      date: new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      time: "14:00",
-      location: "Courtroom 3A",
-    }))
+    let programSessions;
+
+    if (newProgram.customSessions && newProgram.customSessions.length > 0) {
+      // Use custom sessions if provided
+      programSessions = newProgram.customSessions.map((session: any, i: number) => ({
+        id: i + 1,
+        number: i + 1,
+        title: session.title,
+        date: new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        time: "14:00",
+        location: "Courtroom 3A",
+      }));
+    } else {
+      // Default / Library fallback
+      programSessions = Array.from({ length: newProgram.sessions }, (_, i) => ({
+        id: i + 1,
+        number: i + 1,
+        title: `Session ${i + 1}`,
+        date: new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        time: "14:00",
+        location: "Courtroom 3A",
+      }))
+    }
 
     const addedProgram = {
       id: Math.max(...programs.map((p) => p.id), 0) + 1,
